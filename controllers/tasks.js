@@ -18,8 +18,15 @@ const createTask = async (req, res) => {
 	}
 }
 
-const getSingleTask = (req, res) => {
-	res.send("ある特定のタスクを取得しました")
+const getSingleTask = async (req, res) => {
+	try {
+		const singleTask = await Task.findOne({_id: req.params.id });
+		if (!singleTask)
+			return res.status(404).json(`_id${req.params.id}は存在しません`)
+		res.status(200).json(singleTask);
+	} catch (err) {
+		res.status(500).json(err);
+	}
 }
 
 const updateTask = (req, res) => {
