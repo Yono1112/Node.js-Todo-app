@@ -1,9 +1,16 @@
+const Task = require("../models/TaskSchema")
+
 const getAllTasks = (req, res) => {
 	res.send("タスクを全て取得しました")
 }
 
-const createTasks = (req, res) => {
-	res.send("タスクを新規作成しました")
+const createTask = async (req, res) => {
+	try {
+		const createTask = await Task.create(req.body);
+		res.status(200).json(createTask);
+	} catch (err) {
+		res.status(500).json(err);
+	}
 }
 
 const getSingleTask = (req, res) => {
@@ -20,7 +27,7 @@ const deleteTask = (req, res) => {
 
 module.exports = {
 	getAllTasks,
-	createTasks,
+	createTask,
 	getSingleTask,
 	updateTask,
 	deleteTask
