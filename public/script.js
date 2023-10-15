@@ -1,10 +1,16 @@
 const tasksDOM = document.querySelector(".tasks");
 const formDOM = document.querySelector(".task-form");
 const taskInputDOM = document.querySelector(".task-input");
+const formAlertDOM = document.querySelector(".form-alert");
 
 const showTasks = async () => {
 	try {
 		const { data: tasks } = await axios.get("/api/v1/tasks");
+
+		if (!tasks.length) {
+			return tasksDOM.innerHTML = `<h5 class="empty-list">タスクが存在しません</h5>`;
+		}
+
 		const allTasks = tasks.map((task) => {
 			const { completed, name, _id } = task;
 			return `
@@ -34,6 +40,8 @@ const showTasks = async () => {
 
 showTasks();
 
+let alertTimeout;
+
 formDOM.addEventListener("submit", async (event) => {
 	event.preventDefault();
 	const name = taskInputDOM.value;
@@ -42,9 +50,20 @@ formDOM.addEventListener("submit", async (event) => {
 		await axios.post("/api/v1/tasks", {name: name})
 		showTasks();
 		taskInputDOM.value = "";
+		formAlertDOM.style.display = "block";
+		formAlertDOM.textContent = "タスクを追加しました";
+		formAlertDOM.classList.add("text-success")
 	} catch (error) {
 		console.log(error);
+		formAlertDOM.style.display = "block";
+		formAlertDOM.innerHTML = "20文字以下にしてください"
 	}
+	if (alertTimeout)
+		clearTimeout(alertTimeout);
+	alertTimeout = setTimeout(() => {
+		formAlertDOM.style.display = "none";
+		formAlertDOM.classList.remove("text-success")
+	}, 3000);
 })
 
 tasksDOM.addEventListener("click", async (event) => {
